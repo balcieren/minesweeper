@@ -8,7 +8,7 @@ The project was developed for Object-Oriented Programming - Laboratory by Eren B
 
 According to TechRadar, Minesweeper was created by Microsoft in the 1990s, but Eurogamer commented that Minesweeper gained a lot of inspiration from a "lesser known, tightly designed game", Mined-Out by Ian Andrew for the ZX Spectrum in 1983. According to Andrew, Microsoft copied Mined-Out for Microsoft Minesweeper.
 
-## Controls
+### Controls
 
 To change the board size, you can change its value by clicking on it with the mouse and using the up and down arrow keys on the keyboard in main menu.
 
