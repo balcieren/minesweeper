@@ -1,5 +1,7 @@
 # Minesweeper (SFML)
 
+[Minesweeper (Console)](https://github.com/balcieren/minesweeper/tree/main)
+
 ### About
 
 The project was developed for Object-Oriented Programming - Laboratory by Eren Balci using C++.
