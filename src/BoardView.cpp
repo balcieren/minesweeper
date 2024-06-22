@@ -1,147 +1,137 @@
 #include "BoardView.h"
 #include "Board.h"
 #include <iostream>
-#include <Color.h>
+#include <SFML/Graphics.hpp>
 
-BoardView::BoardView(Board &board) : board(board) {}
-
-void BoardView::displayInput()
-{
-    char cmd;
-    int row, col;
-
-reTry:
-    std::cout << YELLOW << "Enter command ('r' to reveal or 'f' to flag) and coordinates (row col): " << RESET;
-    ;
-    std::cin >> cmd >> row >> col;
-    if (std::cin.fail())
-    {
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        std::cout << RED << "Invalid input!" << RESET << std::endl;
-        goto reTry;
-    }
-
-    if (cmd == 'r' && row >= 0 && row < board.getHeight() && col >= 0 && col < board.getWidth())
-    {
-        board.revealField(col, row);
-    }
-    else if (cmd == 'f' && row >= 0 && row < board.getHeight() && col >= 0 && col < board.getWidth())
-    {
-        board.toggleFlag(col, row);
-    }
-    else
-    {
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        std::cout << RED << "Invalid command!" << RESET << std::endl;
-        goto reTry;
-    }
-}
+BoardView::BoardView(Board &board, sf::RenderWindow &window) : board(board), window(window) {}
 
 void BoardView::displayWon()
 {
-    std::cout << GREEN << "You won!" << RESET << std::endl;
-    std::cout << "Press enter to go to main menu" << std::endl;
-    std::cin.ignore();
-    std::cin.get();
-    board.setGameState(GameState::MAIN_MENU);
+    sf::Font font;
+    font.loadFromFile("./assets/font.ttf");
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString("You won!");
+    text.setCharacterSize(36);
+    text.setFillColor(sf::Color::Green);
+    text.setStyle(sf::Text::Bold);
+    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+    text.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    window.draw(text);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    {
+        board.setGameState(GameState::MAIN_MENU);
+    }
+
+    sf::Text PressEnterText;
+    PressEnterText.setFont(font);
+    PressEnterText.setString("Press Enter to return to the main menu");
+    PressEnterText.setCharacterSize(14);
+    PressEnterText.setFillColor(sf::Color::Green);
+    PressEnterText.setStyle(sf::Text::Bold);
+    PressEnterText.setOrigin(PressEnterText.getLocalBounds().width / 2, PressEnterText.getLocalBounds().height / 2);
+    PressEnterText.setPosition(window.getSize().x / 2, window.getSize().y / 2 + 25);
+    window.draw(PressEnterText);
 }
 
 void BoardView::displayLost()
 {
-    std::cout << RED << "You lost!" << RESET << std::endl;
-    std::cout << "Press enter to go to main menu" << std::endl;
-    std::cin.ignore();
-    std::cin.get();
-    board.setGameState(GameState::MAIN_MENU);
+
+    sf::Font font;
+    font.loadFromFile("./assets/font.ttf");
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString("You lost!");
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::Red);
+    text.setStyle(sf::Text::Bold);
+    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+    text.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    window.draw(text);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    {
+        board.setGameState(GameState::MAIN_MENU);
+    }
+
+    sf::Text PressEnterText;
+    PressEnterText.setFont(font);
+    PressEnterText.setString("Press Enter to return to the main menu");
+    PressEnterText.setCharacterSize(14);
+    PressEnterText.setFillColor(sf::Color::Red);
+    PressEnterText.setStyle(sf::Text::Bold);
+    PressEnterText.setOrigin(PressEnterText.getLocalBounds().width / 2, PressEnterText.getLocalBounds().height / 2);
+    PressEnterText.setPosition(window.getSize().x / 2, window.getSize().y / 2 + 25);
+    window.draw(PressEnterText);
+}
+
+void BoardView::displayBoard()
+{
+    int w = 32;
+
+    sf::Texture t;
+    t.loadFromFile("./assets/tiles.png");
+    t.setSmooth(true);
+    sf::Sprite s(t);
+
+    for (int y = 0; y < board.getHeight(); y++)
+    {
+        for (int x = 0; x < board.getWidth(); x++)
+        {
+            char f = board.getFieldInfo(x, y);
+            if (f == '*')
+            {
+                s.setTextureRect(sf::IntRect(9 * w, 0, w, w));
+                s.setPosition(x * w, y * w);
+            }
+            else if (f == ' ')
+            {
+                s.setTextureRect(sf::IntRect(10 * w, 0, w, w));
+                s.setPosition(x * w, y * w);
+            }
+            else if (f == 'F')
+            {
+                s.setTextureRect(sf::IntRect(11 * w, 0, w, w));
+                s.setPosition(x * w, y * w);
+            }
+            else
+            {
+                s.setTextureRect(sf::IntRect(atoi(&f) * w, 0, w, w));
+                s.setPosition(x * w, y * w);
+            }
+            window.draw(s);
+        }
+    }
+
+    sf::Vector2i pos = sf::Mouse::getPosition(window);
+    int x = pos.x / w;
+    int y = pos.y / w;
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && board.getGameState() == GameState::RUNNING)
+    {
+        board.revealField(x, y);
+        sf::sleep(sf::milliseconds(200));
+    }
+    else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && board.getGameState() == GameState::RUNNING)
+    {
+        board.toggleFlag(x, y);
+        sf::sleep(sf::milliseconds(200));
+    }
 }
 
 void BoardView::display()
 {
-    for (int x = 0; x < board.getWidth(); x++)
-    {
-        if (x == 0)
-        {
-            std::cout << "    ";
-        }
+    displayBoard();
 
-        if (x >= 10)
-        {
-            std::cout << " " << x << " ";
-        }
-        else
-        {
-            std::cout << "  " << x << " ";
-        }
-    }
-    std::cout << std::endl;
-    for (int x = 0; x < board.getWidth(); x++)
-    {
-        if (x == 0)
-        {
-            std::cout << "     ";
-        }
-        std::cout << "" << "───" << " ";
-    }
-    std::cout << std::endl;
-
-    for (int y = 0; y < board.getHeight(); y++)
-    {
-        if (y >= 10)
-        {
-            std::cout << y << " │ ";
-        }
-        else
-        {
-            std::cout << y << "  │ ";
-        }
-
-        for (int x = 0; x < board.getWidth(); x++)
-        {
-            std::cout << "[";
-            if (board.getFieldInfo(x, y) == '*')
-            {
-                std::cout << RED << board.getFieldInfo(x, y) << RESET;
-            }
-            else if (board.getFieldInfo(x, y) == 'F')
-            {
-                std::cout << YELLOW << board.getFieldInfo(x, y) << RESET;
-            }
-            else if (board.getFieldInfo(x, y) == '1')
-            {
-                std::cout << GREEN << board.getFieldInfo(x, y) << RESET;
-            }
-            else if (board.getFieldInfo(x, y) == '2')
-            {
-                std::cout << BLUE << board.getFieldInfo(x, y) << RESET;
-            }
-            else if (board.getFieldInfo(x, y) >= '3')
-            {
-                std::cout << RED << board.getFieldInfo(x, y) << RESET;
-            }
-            else
-            {
-                std::cout << board.getFieldInfo(x, y);
-            }
-            std::cout << "]" << " ";
-        }
-        std::cout << std::endl;
-        std::cout << " " << std::endl;
-    }
-    if (board.getGameState() == GameState::RUNNING)
-    {
-        displayInput();
-    }
-    else if (board.getGameState() == GameState::WON)
+    if (board.getGameState() == GameState::WON)
     {
         displayWon();
     }
     else if (board.getGameState() == GameState::LOST)
     {
         displayLost();
-    }
-    else
-    {
     }
 };

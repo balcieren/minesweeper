@@ -3,15 +3,18 @@
 
 #include <string>
 #include "../include/Menu.h"
+#include <SFML/Graphics.hpp>
 
 class MenuView
 {
 private:
     Menu &menu;
-    void displayInput();
+    sf::RenderWindow &window;
+    void displayBoardSizeInput();
+    void displayPlayButton();
 
 public:
-    MenuView(Menu &menu);
+    MenuView(Menu &menu, sf::RenderWindow &window);
     void display();
 };
 

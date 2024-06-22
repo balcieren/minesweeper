@@ -5,69 +5,81 @@
 #include <iostream>
 #include <Board.h>
 #include <BoardView.h>
-#include "Color.h"
-#include "Logo.h"
-
-void clearScreen()
-{
-    if (system("CLS"))
-        system("clear");
-}
+#include <SFML/Graphics.hpp>
+#include <Logo.h>
 
 void Game::initialize()
 {
-    std::string options[3] = {"HARD", "NORMAL", "EASY"};
-    Menu menu(options);
-    MenuView gameModeMenu(menu);
-
+    int w = 32;
+    Menu menu;
     Board board;
-    BoardView boardView(board);
+    board.setGameState(GameState::MAIN_MENU);
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Minesweeper", sf::Style::Close | sf::Style::Titlebar);
+    window.setKeyRepeatEnabled(false);
+    window.setFramerateLimit(60);
 
-    while (true)
+    MenuView menuView(menu, window);
+    BoardView boardView(board, window);
+    Logo logo(window);
+
+    while (window.isOpen())
     {
-        while (board.getGameState() == GameState::MAIN_MENU)
+        sf::Event event;
+        while (window.pollEvent(event))
         {
-            clearScreen();
-            int width, height;
-            displayLogo();
-        reTryBoardSize:
-            std::cout << YELLOW << "Enter board size (width height): " << RESET;
-            std::cin >> width >> height;
-            if (std::cin.fail())
-            {
-                std::cin.clear();
-                std::cin.ignore(1000, '\n');
-                std::cout << RED << "Invalid input!" << RESET << std::endl;
-                goto reTryBoardSize;
-            }
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
 
-            if (width < 1 || height < 1 || width > 100 || height > 100)
-            {
-                std::cout << RED << "Invalid board size!" << RESET << std::endl;
-                goto reTryBoardSize;
-            }
+        window.clear();
+        if (board.getGameState() == GameState::MAIN_MENU)
+        {
+            window.setSize(sf::Vector2u(800, 600));
+            sf::View view(sf::FloatRect(0, 0, 800, 600));
+            view.setCenter(400, 300);
+            window.setView(view);
 
-            std::cout << YELLOW << "Select game mode: " << RESET << std::endl;
-            gameModeMenu.display();
+            menuView.display();
+            logo.display();
+
             switch (menu.getSelectedOption())
             {
             case 0:
-                board = Board(width, height, GameMode::HARD);
+                board = Board(menu.getBoardWidth(), menu.getBoardHeight(), GameMode::HARD);
+                board.setGameState(GameState::MAIN_MENU);
                 break;
             case 1:
-                board = Board(width, height, GameMode::NORMAL);
+                board = Board(menu.getBoardWidth(), menu.getBoardHeight(), GameMode::NORMAL);
+                board.setGameState(GameState::MAIN_MENU);
                 break;
             case 2:
-                board = Board(width, height, GameMode::EASY);
-                break;
-            default:
+                board = Board(menu.getBoardWidth(), menu.getBoardHeight(), GameMode::EASY);
+                board.setGameState(GameState::MAIN_MENU);
                 break;
             }
+
+            if (menu.getPressedPlayButton() && menu.getSelectedOption() != -1)
+            {
+                board.setGameState(GameState::RUNNING);
+                menu.setSelectedOption(-1);
+                menu.setPressedPlayButton(false);
+                sf::sleep(sf::milliseconds(500));
+            }
+            else
+            {
+                menu.setPressedPlayButton(false);
+            }
         }
-        while (board.getGameState() == GameState::RUNNING || board.getGameState() == GameState::WON || board.getGameState() == GameState::LOST)
+
+        if (board.getGameState() == GameState::RUNNING || board.getGameState() == GameState::WON || board.getGameState() == GameState::LOST)
         {
-            clearScreen();
+
+            window.setSize(sf::Vector2u(board.getWidth() * w, board.getHeight() * w));
+            sf::View view(sf::FloatRect(0, 0, board.getWidth() * w, board.getHeight() * w));
+            window.setView(view);
             boardView.display();
         }
+
+        window.display();
     }
 }

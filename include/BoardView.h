@@ -2,17 +2,19 @@
 #define BOARDVIEW_H
 
 #include "Board.h"
+#include <SFML/Graphics.hpp>
 
 class BoardView
 {
 private:
     Board &board;
-    void displayInput();
+    sf::RenderWindow &window;
     void displayWon();
     void displayLost();
+    void displayBoard();
 
 public:
-    BoardView(Board &board);
+    BoardView(Board &board, sf::RenderWindow &window);
     void display();
 };
 

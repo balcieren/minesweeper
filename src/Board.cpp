@@ -100,11 +100,11 @@ reReveal:
     }
 
     bool allFieldsRevealed = true;
-    for (int h = 0; h < height; ++h)
+    for (int i = 0; i < height; ++i)
     {
-        for (int x = 0; x < width; ++h)
+        for (int j = 0; j < width; ++j)
         {
-            if (!board[x][h].isRevealed && !board[x][h].hasMine)
+            if (!board[i][j].isRevealed && !board[i][j].hasMine)
             {
                 allFieldsRevealed = false;
                 break;

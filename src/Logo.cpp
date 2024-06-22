@@ -1,18 +1,22 @@
-#include <Logo.h>
-#include <iostream>
-#include <Color.h>
+#include "Logo.h"
 
-void displayLogo()
+Logo::Logo(sf::RenderWindow &window) : window(window)
 {
-    std::cout << GREEN << R"(
-___  ________ _   _  _____ _____  _    _ _____ ___________ ___________ 
-|  \/  |_   _| \ | ||  ___/  ___|| |  | |  ___|  ___| ___ \  ___| ___ \
-| .  . | | | |  \| || |__ \ `--. | |  | | |__ | |__ | |_/ / |__ | |_/ /
-| |\/| | | | | . ` ||  __| `--. \| |/\| |  __||  __||  __/|  __||    / 
-| |  | |_| |_| |\  || |___/\__/ /\  /\  / |___| |___| |   | |___| |\ \ 
-\_|  |_/\___/\_| \_/\____/\____/  \/  \/\____/\____/\_|   \____/\_| \_|
-                       
-                       created by EREN BALCI                             
-                                                                       
-)" << RESET << std::endl;
+}
+
+void Logo::display()
+{
+    sf::Font font;
+    font.loadFromFile("./assets/font.ttf");
+    sf::Text t;
+
+    t.setFont(font);
+    t.setString("MINESWEEPER");
+    t.setCharacterSize(96);
+    t.setFillColor(sf::Color::Red);
+    t.setStyle(sf::Text::Bold);
+    t.setOrigin(t.getLocalBounds().width / 2, t.getLocalBounds().height / 2);
+    t.setPosition(window.getSize().x / 2, window.getSize().y / 2 - 200);
+
+    window.draw(t);
 }

@@ -1,6 +1,17 @@
 #ifndef LOGO_H
 #define LOGO_H
 
-void displayLogo();
+#include <SFML/Graphics.hpp>
 
-#endif // LOGO_H
+class Logo
+{
+private:
+    sf::RenderWindow &window;
+
+public:
+public:
+    Logo(sf::RenderWindow &window);
+    void display();
+};
+
+#endif // GAME_H
