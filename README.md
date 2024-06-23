@@ -4,7 +4,7 @@
 
 ### About
 
-The project was developed for Object-Oriented Programming - Laboratory by Eren Balci using C++.
+The project was developed for Wrocław University of Science and Technology - Object-Oriented Programming - Laboratory by Eren Balci using C++.
 
 ### History of the game
 
